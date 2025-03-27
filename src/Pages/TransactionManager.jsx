@@ -96,7 +96,7 @@ export default function TransactionManager() {
                   >
                     <td className="p-2 md:p-3 border border-[#292929]">{t.date}</td>
                     <td className="p-2 md:p-3 border border-[#292929]">{t.description}</td>
-                    <td className={`p-2 md:p-3 border border-[#292929] ${t.type === "Income" ? "text-green-400" : "text-red-400"}`}>{t.type}</td>
+                    <td className={`p-2 md:p-3 border border-[#292929] ${t.type === "Income" ? "text-green-400": t.type === "Expense" ? "text-red-400":"text-yellow-400"}`}>{t.type}</td>
                     <td className="p-2 md:p-3 border border-[#292929]">₹{t.amount.toFixed(2)}</td>
                     <td className="p-2 md:p-3 border border-[#292929] flex gap-2">
                       <button onClick={() => handleEdit(t)} className="text-[#03DAC6]">✏️</button>
@@ -129,6 +129,7 @@ export default function TransactionManager() {
                   <select name="type" value={form.type} onChange={handleChange} className="w-full p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white">
                     <option value="Expense">Expense</option>
                     <option value="Income">Income</option>
+                    <option value="Upcoming Expense">Upcoming Expense</option>
                   </select>
                   <input type="date" name="date" value={form.date} onChange={handleChange} className="w-full p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white" />
                   <div className="flex justify-between">
