@@ -8,6 +8,7 @@ import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import ContactUs from "./Pages/ContactUs";
 import Transection from "./Pages/TransactionManager";
+import AboutUs from "./Pages/AboutUs";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/contactus" element={<ContactUs />} />
+        <Route path="/about" element={<AboutUs />} />
         <Route path="/transaction" element={<Transection />} />
         <Route path="/test" element={<Signup />} />
       </Routes>
