@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import Navbar from "../Components/Navbar";
-
+import ExpensePieChart from "./ExpensePieChart";
 export default function BudgetAnalytics() {
   // State for transactions from localStorage
   const [transactions, setTransactions] = useState([]);
@@ -97,6 +97,7 @@ export default function BudgetAnalytics() {
           style={{ overflowY: 'hidden' }} // Allow table to expand without scrollbar
 
         >
+          <ExpensePieChart></ExpensePieChart>
           <h3 className="text-lg font-semibold text-white mb-2">Expense Table</h3>
         {filteredTransactions.length === 0 ? (
           <p className="text-center text-gray-400">No transactions found.</p>
