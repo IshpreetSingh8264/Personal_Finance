@@ -6,12 +6,7 @@ import { useNavigate } from "react-router-dom";
 const FinancialDetails = ({ data, upExp }) => {
     const Navigator = useNavigate();
     const [expanded, setExpanded] = useState(false);
-
-
-    const transactions = data
-    // Take the first 5 entries
-    // setTransactions(sortedTransactions.slice(0, 5));;
-    console.log(data.slice(0, 5));
+    const transactions = data;
 
     // Calculate total Income and expenses
     const totalIncome = transactions.filter(tx => tx.type === "Income").reduce((acc, tx) => acc + tx.amount, 0);
