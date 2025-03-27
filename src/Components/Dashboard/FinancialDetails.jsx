@@ -101,15 +101,12 @@ const FinancialDetails = ({ data, upExp }) => {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className={`flex flex-col items-center mt-4 ${expanded ? "pt-1" : ""}`}
                 >
-                    {/* Last Updated Text */}
-                    <span className="text-sm text-[#757575]">Last updated: Today, 2:30 PM</span>
-
                     {/* Expand/Collapse Button Inside the Expanded Section */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.4 }}
-                        className={`mt-2 p-2 rounded-lg cursor-pointer hover:bg-[#333333] transition ${expanded ? "bg-[#292929]" : ""
+                        className={` p-2 rounded-lg cursor-pointer hover:bg-[#333333] transition ${expanded ? "bg-[#292929]" : ""
                             }`}
                         onClick={() => setExpanded(!expanded)}
                     >

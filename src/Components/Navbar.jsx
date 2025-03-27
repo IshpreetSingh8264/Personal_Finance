@@ -19,9 +19,10 @@ export default function Navbar() {
         { name: "Transaction", path: "/transaction" },
         { name: "Ai Chat", path: "/aichat" },
         { name: "Ai Analytics", path: "/analytics" },
+        { name: "AI Prediction", path: "/prediction" },
         { name: "Financial Goals", path: "/FinancialGoals" },
         { name: "About Us", path: "/about" },
-        { name: "Contact Us", path: "/contactus" }
+        { name: "Contact Us", path: "/contactus" },
     ];
 
     return (
