@@ -8,18 +8,33 @@ import { motion } from "framer-motion";
 
 function Dashboard() {
     const [transactions, setTransactions] = useState([]);
-    
+    const [upExp, setupExp] = useState()
+
     useEffect(() => {
         const storedTransactions = localStorage.getItem("transactions");
         if (storedTransactions) {
             const parsedTransactions = JSON.parse(storedTransactions);
             // Sort transactions by datetime in descending order (latest first)
             const sortedTransactions = parsedTransactions.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-            // Take the first 5 entries
-            setTransactions(sortedTransactions.slice(0, 5));
+            setTransactions(sortedTransactions);
         }
+
+
     }, []);
-    
+
+    useEffect(() => {
+        setupExp(0);
+        let temp = 0;
+        transactions.map((el) => {
+            if (el.type == "Upcoming Expense") {
+                temp += el.amount;
+            }
+            
+        })
+        setupExp(temp);
+        console.log(temp);
+    }, [transactions])
+
 
     return (
         <div className="bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
@@ -41,7 +56,7 @@ function Dashboard() {
             </motion.div>
 
             <QuickActions />
-            <FinancialDetails data={transactions} />
+            <FinancialDetails data={transactions} upExp={upExp} />
             <Recommendations />
 
         </div>

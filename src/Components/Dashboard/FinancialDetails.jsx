@@ -1,14 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const FinancialDetails = ({data}) => {
-     const Navigator = useNavigate();
+const FinancialDetails = ({ data , upExp}) => {
+    const Navigator = useNavigate();
     const [expanded, setExpanded] = useState(false);
+
+
+    const transactions = data
+    // Take the first 5 entries
+    // setTransactions(sortedTransactions.slice(0, 5));;
+    console.log(data.slice(0, 5));
     
-    const transactions = data;
-    console.log(data)
+    
+   
+    
+
 
     // Calculate total Income and expenses
     const totalIncome = transactions.filter(tx => tx.type === "Income").reduce((acc, tx) => acc + tx.amount, 0);
@@ -18,11 +26,11 @@ const FinancialDetails = ({data}) => {
     return (
         <div className="bg-[#121212] text-[#E0E0E0] p-5">
             <div className="bg-[#1E1E1E] rounded-xl shadow-sm border border-[#292929] p-4 ">
-                
+
                 {/* Highlighted Financial Summary Section */}
                 <div className="bg-[#232323] rounded-lg p-5">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        
+
                         {/* Income Column */}
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Income</h3>
@@ -49,7 +57,7 @@ const FinancialDetails = ({data}) => {
                         {/* Upcoming Expense Column */}
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Upcoming Expense</h3>
-                            <div className="text-2xl font-bold text-[#FF9800]">₹1,450.00</div>
+                            <div className="text-2xl font-bold text-[#FF9800]">₹{Math.abs(upExp).toFixed(2)}</div>
                             <div className="text-sm text-[#B0B0B0] mt-2">Due in next 30 days</div>
                         </div>
 
@@ -69,16 +77,16 @@ const FinancialDetails = ({data}) => {
                 >
                     <h4 className="text-lg font-semibold text-[#FFFFFF] mb-3">Last 5 Transactions</h4>
                     <ul className="space-y-2">
-                        {transactions.map((tx) => (
+                        {transactions.slice(0, 5).map((tx) => (
                             <li
                                 key={tx.id}
                                 className="flex justify-between p-3 rounded-lg bg-[#1E1E1E] border border-[#292929]"
                             >
                                 <span className="text-[#E0E0E0]">{tx.description}</span>
                                 <span
-                                    className={tx.type === "Income" ? "text-[#00C853] font-bold" : "text-[#F44336] font-bold"}
+                                    className={tx.type === "Income" ? "text-[#00C853] font-bold" : tx.type === "Expense" ?"text-[#F44336] font-bold" : "text-[#FF9800] font-bold"}
                                 >
-                                    {tx.type === "Income"? `+₹${tx.amount.toFixed(2)}` : `-₹${Math.abs(tx.amount).toFixed(2)}`}
+                                    {tx.type === "Income" ? `+₹${tx.amount.toFixed(2)}` : tx.type === "Expense" ? `-₹${Math.abs(tx.amount).toFixed(2)}` : `-₹${Math.abs(tx.amount).toFixed(2)}`}
                                 </span>
                             </li>
                         ))}
@@ -86,7 +94,7 @@ const FinancialDetails = ({data}) => {
 
                     {/* View All Transactions Button */}
                     <div className="flex justify-end mt-4">
-                        <a onClick={()=>Navigator('/transaction')} className="text-sm text-[#03DAC6] hover:text-[#FFFFFF] cursor-pointer">
+                        <a onClick={() => Navigator('/transaction')} className="text-sm text-[#03DAC6] hover:text-[#FFFFFF] cursor-pointer">
                             View All Transactions →
                         </a>
                     </div>
@@ -107,9 +115,8 @@ const FinancialDetails = ({data}) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.4 }}
-                        className={`mt-2 p-2 rounded-lg cursor-pointer hover:bg-[#333333] transition ${
-                            expanded ? "bg-[#292929]" : ""
-                        }`}
+                        className={`mt-2 p-2 rounded-lg cursor-pointer hover:bg-[#333333] transition ${expanded ? "bg-[#292929]" : ""
+                            }`}
                         onClick={() => setExpanded(!expanded)}
                     >
                         {expanded ? <ChevronUp size={32} color="#E0E0E0" /> : <ChevronDown size={32} color="#E0E0E0" />}
