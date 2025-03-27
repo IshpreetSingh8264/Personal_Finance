@@ -1,0 +1,83 @@
+.toggle {
+    width: 40px;
+    height: 40px;
+    display: hidden;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.5s ease-in-out;
+    position: relative;
+}
+/* if mobile screen, toggle becomes display flex */
+@media (max-width: 768px) {
+    .toggle {
+        display: flex;
+    }
+}
+.bars {
+    width: 30px;
+    height: 4px;
+    background-color: rgb(176, 92, 255);
+    border-radius: 4px;
+    transition: all 0.3s ease-in-out;
+    position: absolute;
+}
+
+#bar1 {
+    transform: translateY(-8px);
+}
+
+#bar2 {
+    opacity: 1;
+}
+
+#bar3 {
+    transform: translateY(8px);
+}
+
+/* When menu is open */
+.toggle.open #bar1 {
+    transform: rotate(45deg) translateY(0px);
+}
+
+.toggle.open #bar2 {
+    opacity: 0;
+}
+
+.toggle.open #bar3 {
+    transform: rotate(-45deg) translateY(-1px);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    background-color: #121212;
+    border-top: 1px solid #292929;
+    padding: 2rem 1.5rem;
+}
+
+.mobile-menu a {
+    color: #B0B0B0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
+    transition: color 0.3s ease;
+}
+
+.mobile-menu a:hover {
+    color: #4CAF50;
+}
+
+.mobile-auth {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    align-items: center;
+}
