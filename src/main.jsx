@@ -11,7 +11,7 @@ import Transection from "./Pages/TransactionManager";
 import AboutUs from "./Pages/AboutUs";
 import AiChat from "./Pages/AiChat";
 import FinancialGoals from "./Pages/FinancialGoals";
-
+import Analytics from "./Pages/Analytics";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -24,7 +24,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/aichat" element={<AiChat />} />
         <Route path="/transaction" element={<Transection />} />
         <Route path="/test" element={<Signup />} />
-        <Route path="/FinancialGoals" element={<FinancialGoals />} />
+        <Route path="/financialgoals" element={<FinancialGoals />} />
+        <Route path="/analytics" element={<Analytics />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
