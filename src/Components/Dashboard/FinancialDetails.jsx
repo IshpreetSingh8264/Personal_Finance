@@ -35,14 +35,14 @@ const FinancialDetails = ({ data , upExp}) => {
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Income</h3>
                             <div className="text-2xl font-bold text-[#00C853]">₹{totalIncome.toFixed(2)}</div>
-                            <div className="text-sm text-[#B0B0B0] mt-2">12% from last month</div>
+                            
                         </div>
 
                         {/* Expense Column */}
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Expense</h3>
                             <div className="text-2xl font-bold text-[#F44336]">₹{Math.abs(totalExpense).toFixed(2)}</div>
-                            <div className="text-sm text-[#B0B0B0] mt-2">8% from last month</div>
+                            
                         </div>
 
                         {/* Balance Column */}
@@ -51,14 +51,13 @@ const FinancialDetails = ({ data , upExp}) => {
                             <div className={`text-2xl font-bold ${balance >= 0 ? "text-[#00C853]" : "text-[#F44336]"}`}>
                                 ₹{balance.toFixed(2)}
                             </div>
-                            <div className="text-sm text-[#B0B0B0] mt-2">Net balance</div>
                         </div>
 
                         {/* Upcoming Expense Column */}
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Upcoming Expense</h3>
                             <div className="text-2xl font-bold text-[#FF9800]">₹{Math.abs(upExp).toFixed(2)}</div>
-                            <div className="text-sm text-[#B0B0B0] mt-2">Due in next 30 days</div>
+                            
                         </div>
 
                     </div>
