@@ -34,7 +34,7 @@ const QuickActions = () => {
                 </button>
 
                 {/* Set Financial Goal */}
-                <button onClick={()=>Navigator('/analytics')} className="flex cursor-pointer items-center gap-3 p-4 bg-[#D17D00] hover:bg-[#A66300] text-white rounded-lg font-medium shadow-md transition">
+                <button onClick={()=>Navigator('/financialgoals')} className="flex cursor-pointer items-center gap-3 p-4 bg-[#D17D00] hover:bg-[#A66300] text-white rounded-lg font-medium shadow-md transition">
                     <Target size={24} /> Set Financial Goal
                 </button>
             </div>
