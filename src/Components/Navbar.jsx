@@ -100,12 +100,13 @@ export default function Navbar() {
                             >
                                 Home
                             </Link>
-                            <a
-                                className="font-medium text-gray-600 hover:text-gray-400 focus:outline-none focus:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500 dark:focus:text-neutral-500"
-                                href="#"
+                            <Link
+                                className="font-medium text-[var(--primary)] focus:outline-none"
+                                to="/Transection"
+                                aria-current="page"
                             >
-                                Account
-                            </a>
+                                Transection
+                            </Link>
                             <a
                                 className="font-medium text-gray-600 hover:text-gray-400 focus:outline-none focus:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500 dark:focus:text-neutral-500"
                                 href="#"

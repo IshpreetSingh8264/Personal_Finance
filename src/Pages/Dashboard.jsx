@@ -2,6 +2,7 @@ import React from 'react'
 import Navbar from '../Components/Navbar'
 import FinancialDetails from '../Components/Dashboard/FinancialDetails'
 import Recommendations from '../Components/Dashboard/Recommendation'
+// import TransactionManager from './TransactionManager'
 
 function Dashboard() {
     return (
@@ -9,6 +10,7 @@ function Dashboard() {
             <Navbar />
             <FinancialDetails />
             <Recommendations />
+            {/* <TransactionManager /> */}
 
         </div>
     )

@@ -25,7 +25,7 @@ const recommendations = [
 
 const Recommendations = () => {
     return (
-        <div className="bg-[#121212] text-[#E0E0E0] min-h-screen p-6">
+        <div className="bg-[#121212] text-[#E0E0E0] p-6">
             <div className="bg-[#1E1E1E] rounded-xl shadow-sm border border-[#292929] p-6">
                 <h2 className="text-2xl font-bold text-[#FFFFFF] mb-4">Personalized Recommendations</h2>
                 <p className="text-[#B0B0B0] mb-6">Based on your spending habits, here are some recommendations to improve your financial health.</p>
