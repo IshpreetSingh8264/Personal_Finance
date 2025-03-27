@@ -19,7 +19,7 @@ const FinancialDetails = () => {
     const balance = totalIncome + totalExpense; // Net balance
 
     return (
-        <div className="bg-[#121212] text-[#E0E0E0] min-h-screen p-5">
+        <div className="bg-[#121212] text-[#E0E0E0] p-5">
             <div className="bg-[#1E1E1E] rounded-xl shadow-sm border border-[#292929] p-4 ">
                 
                 {/* Highlighted Financial Summary Section */}
