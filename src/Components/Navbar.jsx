@@ -38,8 +38,8 @@ export default function Navbar() {
                             Transaction
                             <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-[#4CAF50] transition-all duration-300 group-hover:w-full"></span>
                         </Link>
-                        <Link to="/work" className="relative text-[#B0B0B0] hover:text-[#4CAF50] transition-all duration-300 font-medium group">
-                            Work
+                        <Link to="/aichat" className="relative text-[#B0B0B0] hover:text-[#4CAF50] transition-all duration-300 font-medium group">
+                            Ai Chat
                             <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-[#4CAF50] transition-all duration-300 group-hover:w-full"></span>
                         </Link>
                         <Link to="/contactus" className="relative text-[#B0B0B0] hover:text-[#4CAF50] transition-all duration-300 font-medium group">
