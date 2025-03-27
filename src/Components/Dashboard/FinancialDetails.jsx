@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const FinancialDetails = ({ data , upExp}) => {
+const FinancialDetails = ({ data, upExp }) => {
     const Navigator = useNavigate();
     const [expanded, setExpanded] = useState(false);
 
@@ -12,11 +12,6 @@ const FinancialDetails = ({ data , upExp}) => {
     // Take the first 5 entries
     // setTransactions(sortedTransactions.slice(0, 5));;
     console.log(data.slice(0, 5));
-    
-    
-   
-    
-
 
     // Calculate total Income and expenses
     const totalIncome = transactions.filter(tx => tx.type === "Income").reduce((acc, tx) => acc + tx.amount, 0);
@@ -31,19 +26,6 @@ const FinancialDetails = ({ data , upExp}) => {
                 <div className="bg-[#232323] rounded-lg p-5">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                        {/* Income Column */}
-                        <div className="flex flex-col items-center p-4">
-                            <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Income</h3>
-                            <div className="text-2xl font-bold text-[#00C853]">₹{totalIncome.toFixed(2)}</div>
-                            
-                        </div>
-
-                        {/* Expense Column */}
-                        <div className="flex flex-col items-center p-4">
-                            <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Expense</h3>
-                            <div className="text-2xl font-bold text-[#F44336]">₹{Math.abs(totalExpense).toFixed(2)}</div>
-                            
-                        </div>
 
                         {/* Balance Column */}
                         <div className="flex flex-col items-center p-4 border-l border-[#292929]">
@@ -52,12 +34,25 @@ const FinancialDetails = ({ data , upExp}) => {
                                 ₹{balance.toFixed(2)}
                             </div>
                         </div>
+                        {/* Income Column */}
+                        <div className="flex flex-col items-center p-4">
+                            <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Income</h3>
+                            <div className="text-2xl font-bold text-[#00C853]">₹{totalIncome.toFixed(2)}</div>
+
+                        </div>
+
+                        {/* Expense Column */}
+                        <div className="flex flex-col items-center p-4">
+                            <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Expense</h3>
+                            <div className="text-2xl font-bold text-[#F44336]">₹{Math.abs(totalExpense).toFixed(2)}</div>
+
+                        </div>
 
                         {/* Upcoming Expense Column */}
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Upcoming Expense</h3>
                             <div className="text-2xl font-bold text-[#FF9800]">₹{Math.abs(upExp).toFixed(2)}</div>
-                            
+
                         </div>
 
                     </div>
@@ -83,7 +78,7 @@ const FinancialDetails = ({ data , upExp}) => {
                             >
                                 <span className="text-[#E0E0E0]">{tx.description}</span>
                                 <span
-                                    className={tx.type === "Income" ? "text-[#00C853] font-bold" : tx.type === "Expense" ?"text-[#F44336] font-bold" : "text-[#FF9800] font-bold"}
+                                    className={tx.type === "Income" ? "text-[#00C853] font-bold" : tx.type === "Expense" ? "text-[#F44336] font-bold" : "text-[#FF9800] font-bold"}
                                 >
                                     {tx.type === "Income" ? `+₹${tx.amount.toFixed(2)}` : tx.type === "Expense" ? `-₹${Math.abs(tx.amount).toFixed(2)}` : `-₹${Math.abs(tx.amount).toFixed(2)}`}
                                 </span>

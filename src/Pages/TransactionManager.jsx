@@ -7,6 +7,16 @@ export default function TransactionManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const transactionsPerPage = 10;
+
+  // Pagination calculations
+  const indexOfLastTransaction = currentPage * transactionsPerPage;
+  const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
+  const currentTransactions = transactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
+  const totalPages = Math.ceil(transactions.length / transactionsPerPage);
+
   useEffect(() => {
     const storedTransactions = localStorage.getItem("transactions");
     if (storedTransactions) {
@@ -76,36 +86,55 @@ export default function TransactionManager() {
           {transactions.length === 0 ? (
             <p className="text-center text-gray-400">No transactions yet.</p>
           ) : (
-            <table className="w-full text-left border-collapse border border-[#292929] text-sm md:text-base">
-              <thead>
-                <tr className="bg-[#1E1E1E] text-white">
-                  <th className="p-2 md:p-3 border border-[#292929]">Date</th>
-                  <th className="p-2 md:p-3 border border-[#292929]">Description</th>
-                  <th className="p-2 md:p-3 border border-[#292929]">Type</th>
-                  <th className="p-2 md:p-3 border border-[#292929]">Amount</th>
-                  <th className="p-2 md:p-3 border border-[#292929]">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((t) => (
-                  <motion.tr
-                    key={t.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="hover:bg-[#1C1C1C]"
-                  >
-                    <td className="p-2 md:p-3 border border-[#292929]">{t.date}</td>
-                    <td className="p-2 md:p-3 border border-[#292929]">{t.description}</td>
-                    <td className={`p-2 md:p-3 border border-[#292929] ${t.type === "Income" ? "text-green-400": t.type === "Expense" ? "text-red-400":"text-yellow-400"}`}>{t.type}</td>
-                    <td className="p-2 md:p-3 border border-[#292929]">₹{t.amount.toFixed(2)}</td>
-                    <td className="p-2 md:p-3 border border-[#292929] flex gap-2">
-                      <button onClick={() => handleEdit(t)} className="text-[#03DAC6]">✏️</button>
-                      <button onClick={() => handleDelete(t.id)} className="text-[#F44336]">🗑️</button>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
+            <>
+              <table className="w-full text-left border-collapse border border-[#292929] text-sm md:text-base">
+                <thead>
+                  <tr className="bg-[#1E1E1E] text-white">
+                    <th className="p-2 md:p-3 border border-[#292929]">Date</th>
+                    <th className="p-2 md:p-3 border border-[#292929]">Description</th>
+                    <th className="p-2 md:p-3 border border-[#292929]">Type</th>
+                    <th className="p-2 md:p-3 border border-[#292929]">Amount</th>
+                    <th className="p-2 md:p-3 border border-[#292929]">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentTransactions.map((t) => (
+                    <motion.tr
+                      key={t.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="hover:bg-[#1C1C1C]"
+                    >
+                      <td className="p-2 md:p-3 border border-[#292929]">{t.date}</td>
+                      <td className="p-2 md:p-3 border border-[#292929]">{t.description}</td>
+                      <td className={`p-2 md:p-3 border border-[#292929] ${t.type === "Income" ? "text-green-400": t.type === "Expense" ? "text-red-400":"text-yellow-400"}`}>{t.type}</td>
+                      <td className="p-2 md:p-3 border border-[#292929]">₹{t.amount.toFixed(2)}</td>
+                      <td className="p-2 md:p-3 border border-[#292929] flex gap-2">
+                        <button onClick={() => handleEdit(t)} className="text-[#03DAC6]">✏️</button>
+                        <button onClick={() => handleDelete(t.id)} className="text-[#F44336]">🗑️</button>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="flex justify-between items-center mt-4">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  className="px-4 py-2 bg-[#333333] text-white rounded-lg disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-white">Page {currentPage} of {totalPages}</span>
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  className="px-4 py-2 bg-[#4CAF50] text-white rounded-lg disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </>
           )}
         </div>
 

@@ -29,7 +29,7 @@ export default function Navbar() {
             <header ref={navbarRef} className="fixed top-0 left-0 w-full bg-[#121212] border-b border-[#292929] z-50">
                 <nav className="max-w-[85rem] mx-auto px-6 flex items-center justify-between py-3">
                     <Link to="/" className="text-xl font-semibold text-white flex items-center gap-x-2">
-                        InFlow
+                        <img src="images/logo.png" alt="Logo" className="w-25" />
                     </Link>
 
                     {/* Desktop Navigation */}
