@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -12,11 +13,7 @@ export default function Navbar() {
             <nav className="max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between">
                 <div className="flex items-center justify-between">
                     {/* Brand logo - left side */}
-                    <a
-                        className="flex-none text-xl font-semibold dark:text-white focus:outline-none focus:opacity-80"
-                        href="#"
-                        aria-label="Brand"
-                    >
+                    <Link to="/" aria-label="Brand" className="flex-none text-xl font-semibold dark:text-white focus:outline-none focus:opacity-80">
                         <span className="inline-flex items-center gap-x-2 text-xl font-semibold dark:text-white">
                             <svg
                                 className="w-10 h-auto"
@@ -34,7 +31,8 @@ export default function Navbar() {
                             </svg>
                             Brand
                         </span>
-                    </a>
+                    </Link>
+                 
 
                     {/* Mobile menu toggle button */}
                     <div className="sm:hidden">
@@ -95,13 +93,13 @@ export default function Navbar() {
                     <div className="flex flex-col gap-20 mt-5 sm:flex-row sm:items-center sm:justify-center sm:mt-0 sm:ps-5">
                         {/* Center-aligned navigation links */}
                         <div className="flex flex-col sm:flex-row gap-5">
-                            <a
+                            <Link
                                 className="font-medium text-[var(--primary)] focus:outline-none"
-                                href="#"
+                                to="/"
                                 aria-current="page"
                             >
-                                Landing
-                            </a>
+                                Home
+                            </Link>
                             <a
                                 className="font-medium text-gray-600 hover:text-gray-400 focus:outline-none focus:text-gray-400 dark:text-neutral-400 dark:hover:text-neutral-500 dark:focus:text-neutral-500"
                                 href="#"
@@ -124,18 +122,22 @@ export default function Navbar() {
 
                         {/* Right-aligned sign in/sign up buttons */}
                         <div className="flex flex-col sm:flex-row gap-3">
-                            <a
+                            <Link
+                                to="/login"
                                 className="py-2 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-                                href="#"
+
                             >
                                 Sign in
-                            </a>
-                            <a
+                            </Link>
+                            <Link
+                                to="/signup"
                                 className="py-2 px-4 inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-[var(--primary)] text-white hover:bg-[var(--hover-state)] disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
-                                href="#"
+
                             >
                                 Sign up
-                            </a>
+                            </Link>
+
+
                         </div>
                     </div>
                 </div>
