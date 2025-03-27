@@ -1,8 +1,11 @@
 import React from "react";
 import { PlusCircle, BarChart, Target } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const QuickActions = () => {
+
+    const Navigator = useNavigate();
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -21,7 +24,7 @@ const QuickActions = () => {
             {/* Action Buttons */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Add Transaction */}
-                <button className="flex items-center gap-3 p-4 bg-[#3D8B40] hover:bg-[#2E6C31] text-white rounded-lg font-medium shadow-md transition">
+                <button onClick={()=>Navigator('/transaction')} className=" cursor-pointer flex items-center gap-3 p-4 bg-[#3D8B40] hover:bg-[#2E6C31] text-white rounded-lg font-medium shadow-md transition">
                     <PlusCircle size={24} /> Add Transaction
                 </button>
 

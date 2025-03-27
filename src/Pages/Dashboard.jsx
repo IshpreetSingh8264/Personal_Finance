@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../Components/Navbar";
 import FinancialDetails from "../Components/Dashboard/FinancialDetails";
 import Recommendations from "../Components/Dashboard/Recommendation";
@@ -7,6 +7,20 @@ import { motion } from "framer-motion";
 // import TransactionManager from './TransactionManager'
 
 function Dashboard() {
+    const [transactions, setTransactions] = useState([]);
+    
+    useEffect(() => {
+        const storedTransactions = localStorage.getItem("transactions");
+        if (storedTransactions) {
+            const parsedTransactions = JSON.parse(storedTransactions);
+            // Sort transactions by datetime in descending order (latest first)
+            const sortedTransactions = parsedTransactions.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+            // Take the first 5 entries
+            setTransactions(sortedTransactions.slice(0, 5));
+        }
+    }, []);
+    
+
     return (
         <div className="bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
             <Navbar />
@@ -27,7 +41,7 @@ function Dashboard() {
             </motion.div>
 
             <QuickActions />
-            <FinancialDetails />
+            <FinancialDetails data={transactions} />
             <Recommendations />
 
         </div>

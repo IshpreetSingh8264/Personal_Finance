@@ -1,22 +1,19 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const FinancialDetails = () => {
+const FinancialDetails = ({data}) => {
+     const Navigator = useNavigate();
     const [expanded, setExpanded] = useState(false);
+    
+    const transactions = data;
+    console.log(data)
 
-    const transactions = [
-        { id: 1, description: "Salary", amount: 3500, type: "income" },
-        { id: 2, description: "Grocery Shopping", amount: -120, type: "expense" },
-        { id: 3, description: "Freelance Payment", amount: 1200, type: "income" },
-        { id: 4, description: "Netflix Subscription", amount: -15.99, type: "expense" },
-        { id: 5, description: "Electricity Bill", amount: -90, type: "expense" }
-    ];
-
-    // Calculate total income and expenses
-    const totalIncome = transactions.filter(tx => tx.type === "income").reduce((acc, tx) => acc + tx.amount, 0);
-    const totalExpense = transactions.filter(tx => tx.type === "expense").reduce((acc, tx) => acc + tx.amount, 0);
-    const balance = totalIncome + totalExpense; // Net balance
+    // Calculate total Income and expenses
+    const totalIncome = transactions.filter(tx => tx.type === "Income").reduce((acc, tx) => acc + tx.amount, 0);
+    const totalExpense = transactions.filter(tx => tx.type === "Expense").reduce((acc, tx) => acc + tx.amount, 0);
+    const balance = totalIncome - totalExpense; // Net balance
 
     return (
         <div className="bg-[#121212] text-[#E0E0E0] p-5">
@@ -29,14 +26,14 @@ const FinancialDetails = () => {
                         {/* Income Column */}
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Income</h3>
-                            <div className="text-2xl font-bold text-[#00C853]">${totalIncome.toFixed(2)}</div>
+                            <div className="text-2xl font-bold text-[#00C853]">₹{totalIncome.toFixed(2)}</div>
                             <div className="text-sm text-[#B0B0B0] mt-2">12% from last month</div>
                         </div>
 
                         {/* Expense Column */}
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Expense</h3>
-                            <div className="text-2xl font-bold text-[#F44336]">${Math.abs(totalExpense).toFixed(2)}</div>
+                            <div className="text-2xl font-bold text-[#F44336]">₹{Math.abs(totalExpense).toFixed(2)}</div>
                             <div className="text-sm text-[#B0B0B0] mt-2">8% from last month</div>
                         </div>
 
@@ -44,7 +41,7 @@ const FinancialDetails = () => {
                         <div className="flex flex-col items-center p-4 border-l border-[#292929]">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Balance</h3>
                             <div className={`text-2xl font-bold ${balance >= 0 ? "text-[#00C853]" : "text-[#F44336]"}`}>
-                                ${balance.toFixed(2)}
+                                ₹{balance.toFixed(2)}
                             </div>
                             <div className="text-sm text-[#B0B0B0] mt-2">Net balance</div>
                         </div>
@@ -52,7 +49,7 @@ const FinancialDetails = () => {
                         {/* Upcoming Expense Column */}
                         <div className="flex flex-col items-center p-4">
                             <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Upcoming Expense</h3>
-                            <div className="text-2xl font-bold text-[#FF9800]">$1,450.00</div>
+                            <div className="text-2xl font-bold text-[#FF9800]">₹1,450.00</div>
                             <div className="text-sm text-[#B0B0B0] mt-2">Due in next 30 days</div>
                         </div>
 
@@ -79,9 +76,9 @@ const FinancialDetails = () => {
                             >
                                 <span className="text-[#E0E0E0]">{tx.description}</span>
                                 <span
-                                    className={tx.type === "income" ? "text-[#00C853] font-bold" : "text-[#F44336] font-bold"}
+                                    className={tx.type === "Income" ? "text-[#00C853] font-bold" : "text-[#F44336] font-bold"}
                                 >
-                                    {tx.amount >= 0 ? `+$${tx.amount.toFixed(2)}` : `-$${Math.abs(tx.amount).toFixed(2)}`}
+                                    {tx.type === "Income"? `+₹${tx.amount.toFixed(2)}` : `-₹${Math.abs(tx.amount).toFixed(2)}`}
                                 </span>
                             </li>
                         ))}
@@ -89,7 +86,7 @@ const FinancialDetails = () => {
 
                     {/* View All Transactions Button */}
                     <div className="flex justify-end mt-4">
-                        <a href="#" className="text-sm text-[#03DAC6] hover:text-[#FFFFFF]">
+                        <a onClick={()=>Navigator('/transaction')} className="text-sm text-[#03DAC6] hover:text-[#FFFFFF] cursor-pointer">
                             View All Transactions →
                         </a>
                     </div>
