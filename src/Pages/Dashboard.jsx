@@ -1,46 +1,40 @@
-import React, { useEffect, useState } from "react";
-import Navbar from "../Components/Navbar";
-import FinancialDetails from "../Components/Dashboard/FinancialDetails";
-import Recommendations from "../Components/Dashboard/Recommendation";
-import QuickActions from "../Components/Dashboard/QuickActions";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
-// import TransactionManager from './TransactionManager'
+
+const Navbar = lazy(() => import("../Components/Navbar"));
+const FinancialDetails = lazy(() => import("../Components/Dashboard/FinancialDetails"));
+const Recommendations = lazy(() => import("../Components/Dashboard/Recommendation"));
+const QuickActions = lazy(() => import("../Components/Dashboard/QuickActions"));
 
 function Dashboard() {
     const [transactions, setTransactions] = useState([]);
-    const [upExp, setupExp] = useState()
+    const [upExp, setupExp] = useState(0);
 
     useEffect(() => {
         const storedTransactions = localStorage.getItem("transactions");
         if (storedTransactions) {
             const parsedTransactions = JSON.parse(storedTransactions);
-            // Sort transactions by datetime in descending order (latest first)
             const sortedTransactions = parsedTransactions.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
             setTransactions(sortedTransactions);
         }
-
-
     }, []);
 
     useEffect(() => {
-        setupExp(0);
         let temp = 0;
-        transactions.map((el) => {
-            if (el.type == "Upcoming Expense") {
+        transactions.forEach((el) => {
+            if (el.type === "Upcoming Expense") {
                 temp += el.amount;
             }
-            
-        })
+        });
         setupExp(temp);
-        console.log(temp);
-    }, [transactions])
-
+    }, [transactions]);
 
     return (
         <div className="bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
-            <Navbar />
+            <Suspense fallback={<div>Loading Navbar...</div>}>
+                <Navbar />
+            </Suspense>
 
-            {/* Animated Welcome Banner */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -55,10 +49,21 @@ function Dashboard() {
                 </p>
             </motion.div>
 
-            <QuickActions />
-            <FinancialDetails data={transactions} upExp={upExp} />
-            <Recommendations />
-
+            <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center bg-[#1C1C1C] bg-opacity-75">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03DAC6]"></div>
+            </div>}>
+                <QuickActions />
+            </Suspense>
+            <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center bg-[#1C1C1C] bg-opacity-75">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03DAC6]"></div>
+            </div>}>
+                <FinancialDetails data={transactions} upExp={upExp} />
+            </Suspense>
+            <Suspense fallback={<div className="absolute inset-0 flex items-center justify-center bg-[#1C1C1C] bg-opacity-75">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03DAC6]"></div>
+            </div>}>
+                <Recommendations />
+            </Suspense>
         </div>
     );
 }

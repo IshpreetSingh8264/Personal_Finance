@@ -19,7 +19,7 @@
 .bars {
     width: 30px;
     height: 4px;
-    background-color: rgb(176, 92, 255);
+    background-color: #357d37;
     border-radius: 4px;
     transition: all 0.3s ease-in-out;
     position: absolute;
