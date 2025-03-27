@@ -32,7 +32,7 @@ function Dashboard() {
     }, [transactions]);
 
     useEffect(() => {
-        const storedGoals = localStorage.getItem("todos");
+        const storedGoals = localStorage.getItem("goals");
         if (storedGoals) {
             const parsedGoals = JSON.parse(storedGoals);
             setTopGoals(parsedGoals.slice(0, 3)); // Get top 3 latest goals

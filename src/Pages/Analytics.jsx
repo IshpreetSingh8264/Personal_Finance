@@ -43,13 +43,6 @@ export default function BudgetAnalytics() {
   const upcomingExpenses = transactions.filter((t) => t.type === "Upcoming Expense").reduce((acc, curr) => acc + curr.amount, 0);
   const balance = income - expenses; // upcoming expenses are not subtracted
 
-  // Data for Pie Chart
-  const pieData = [
-    { name: "Income", value: income, color: "#4CAF50" },
-    { name: "Expenses", value: expenses, color: "#F44336" },
-    { name: "Upcoming Expense", value: upcomingExpenses, color: "#FF9800" },
-  ];
-
   // Build balance history data from transactions
   const balanceHistoryRaw = transactions
     .sort((a, b) => new Date(a.date) - new Date(b.date))
@@ -69,19 +62,6 @@ export default function BudgetAnalytics() {
     if (end && dDate > end) return false;
     return true;
   });
-
-  // Handler for pie chart clicks: toggle filter
-  const handlePieClick = (data, index) => {
-    if (data.name === "Expenses") {
-      setFilterType("Expense");
-      setCurrentPage(1); // Reset page on filter
-    } else if (filterType === data.name) {
-      setFilterType(null); // Clear filter
-    } else {
-      setFilterType(data.name);
-      setCurrentPage(1); // Reset page on filter
-    }
-  };
 
   return (
     <div className="bg-[#121212] min-h-screen text-[#E0E0E0] p-6">
@@ -150,35 +130,6 @@ export default function BudgetAnalytics() {
         animate={{ opacity: 1, y: 0 }}
         initial={{ opacity: 0, y: 20 }}
       >
-        <PieChart width={400} height={400}>
-
-          <Pie
-            data={pieData}
-            cx="50%"
-            cy="50%"
-            innerRadius={70}
-            outerRadius={130}
-            fill="#8884d8"
-            dataKey="value"
-            onClick={handlePieClick}
-          >
-            {pieData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-        {filterType && (
-          <motion.button
-            onClick={() => setFilterType(null)}
-            className="mt-2 px-4 py-2 bg-[#03DAC6] text-white rounded"
-            whileHover={{ scale: 1.05 }}
-          >
-            Clear Filter: {filterType}
-          </motion.button>
-        )}
-
         <div className="mt-6 w-full bg-[#1E1E1E] p-4 rounded-lg shadow-md border border-[#292929]">
           <h3 className="text-lg font-semibold text-white mb-2 text-center">Balance History</h3>
           <div className="flex gap-2 justify-center mb-4">
