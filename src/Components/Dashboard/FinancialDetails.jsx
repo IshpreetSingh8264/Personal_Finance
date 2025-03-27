@@ -1,0 +1,126 @@
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { ChevronDown, ChevronUp } from "lucide-react";
+
+const FinancialDetails = () => {
+    const [expanded, setExpanded] = useState(false);
+
+    const transactions = [
+        { id: 1, description: "Salary", amount: 3500, type: "income" },
+        { id: 2, description: "Grocery Shopping", amount: -120, type: "expense" },
+        { id: 3, description: "Freelance Payment", amount: 1200, type: "income" },
+        { id: 4, description: "Netflix Subscription", amount: -15.99, type: "expense" },
+        { id: 5, description: "Electricity Bill", amount: -90, type: "expense" }
+    ];
+
+    // Calculate total income and expenses
+    const totalIncome = transactions.filter(tx => tx.type === "income").reduce((acc, tx) => acc + tx.amount, 0);
+    const totalExpense = transactions.filter(tx => tx.type === "expense").reduce((acc, tx) => acc + tx.amount, 0);
+    const balance = totalIncome + totalExpense; // Net balance
+
+    return (
+        <div className="bg-[#121212] text-[#E0E0E0] min-h-screen p-5">
+            <div className="bg-[#1E1E1E] rounded-xl shadow-sm border border-[#292929] p-4 ">
+                
+                {/* Highlighted Financial Summary Section */}
+                <div className="bg-[#232323] rounded-lg p-5">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        
+                        {/* Income Column */}
+                        <div className="flex flex-col items-center p-4">
+                            <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Income</h3>
+                            <div className="text-2xl font-bold text-[#00C853]">${totalIncome.toFixed(2)}</div>
+                            <div className="text-sm text-[#B0B0B0] mt-2">12% from last month</div>
+                        </div>
+
+                        {/* Expense Column */}
+                        <div className="flex flex-col items-center p-4">
+                            <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Expense</h3>
+                            <div className="text-2xl font-bold text-[#F44336]">${Math.abs(totalExpense).toFixed(2)}</div>
+                            <div className="text-sm text-[#B0B0B0] mt-2">8% from last month</div>
+                        </div>
+
+                        {/* Balance Column */}
+                        <div className="flex flex-col items-center p-4 border-l border-[#292929]">
+                            <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Balance</h3>
+                            <div className={`text-2xl font-bold ${balance >= 0 ? "text-[#00C853]" : "text-[#F44336]"}`}>
+                                ${balance.toFixed(2)}
+                            </div>
+                            <div className="text-sm text-[#B0B0B0] mt-2">Net balance</div>
+                        </div>
+
+                        {/* Upcoming Expense Column */}
+                        <div className="flex flex-col items-center p-4">
+                            <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Upcoming Expense</h3>
+                            <div className="text-2xl font-bold text-[#FF9800]">$1,450.00</div>
+                            <div className="text-sm text-[#B0B0B0] mt-2">Due in next 30 days</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {/* Horizontal Line */}
+                <div className="border-t border-[#292929] my-10"></div>
+
+                {/* Expandable Section */}
+                <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: expanded ? "auto" : 0, opacity: expanded ? 1 : 0 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                >
+                    <h4 className="text-lg font-semibold text-[#FFFFFF] mb-3">Last 5 Transactions</h4>
+                    <ul className="space-y-2">
+                        {transactions.map((tx) => (
+                            <li
+                                key={tx.id}
+                                className="flex justify-between p-3 rounded-lg bg-[#1E1E1E] border border-[#292929]"
+                            >
+                                <span className="text-[#E0E0E0]">{tx.description}</span>
+                                <span
+                                    className={tx.type === "income" ? "text-[#00C853] font-bold" : "text-[#F44336] font-bold"}
+                                >
+                                    {tx.amount >= 0 ? `+$${tx.amount.toFixed(2)}` : `-$${Math.abs(tx.amount).toFixed(2)}`}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+
+                    {/* View All Transactions Button */}
+                    <div className="flex justify-end mt-4">
+                        <a href="#" className="text-sm text-[#03DAC6] hover:text-[#FFFFFF]">
+                            View All Transactions →
+                        </a>
+                    </div>
+                </motion.div>
+
+                {/* Last Updated and Arrow Inside the Expanded Section */}
+                <motion.div
+                    initial={false}
+                    animate={{ y: expanded ? 0 : -40 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className={`flex flex-col items-center mt-4 ${expanded ? "pt-1" : ""}`}
+                >
+                    {/* Last Updated Text */}
+                    <span className="text-sm text-[#757575]">Last updated: Today, 2:30 PM</span>
+
+                    {/* Expand/Collapse Button Inside the Expanded Section */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.4 }}
+                        className={`mt-2 p-2 rounded-lg cursor-pointer hover:bg-[#333333] transition ${
+                            expanded ? "bg-[#292929]" : ""
+                        }`}
+                        onClick={() => setExpanded(!expanded)}
+                    >
+                        {expanded ? <ChevronUp size={32} color="#E0E0E0" /> : <ChevronDown size={32} color="#E0E0E0" />}
+                    </motion.div>
+                </motion.div>
+            </div>
+        </div>
+    );
+};
+
+export default FinancialDetails;
