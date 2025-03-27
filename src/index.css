@@ -1,1 +1,68 @@
 @import "tailwindcss";
+/* @import 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'; */
+
+/* Extend Tailwind with custom colors and typography */
+@layer base {
+  /* Custom Colors */
+  :root {
+    --background-primary: #121212;
+    --background-secondary: #1E1E1E;
+    --primary: #4CAF50;
+    --secondary: #03DAC6;
+    --text-primary: #E0E0E0;
+    --text-secondary: #B0B0B0;
+    --text-muted: #757575;
+    --headings: #FFFFFF;
+    --error: #F44336;
+    --success: #00C853;
+    --warning: #FF9800;
+    --button-primary: #4CAF50;
+    --button-secondary: #333333;
+    --border-dividers: #292929;
+    --hover-state: #388E3C;
+    --input-field-background: #1C1C1C;
+  }
+
+  /* Font Families */
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; /* Bold */
+    color: var(--headings);
+  }
+
+  h2, h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600; /* Semi-Bold */
+    color: var(--text-primary);
+  }
+
+  p, span, div {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400; /* Regular */
+    color: var(--text-muted);
+  }
+
+  .btn-primary {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500; /* Medium */
+    color: #FFFFFF;
+    background-color: var(--primary);
+    padding: 10px 20px;
+    border-radius: 5px;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--hover-state);
+  }
+
+  .input-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500; /* Medium */
+    color: var(--text-secondary);
+  }
+}
+
