@@ -18,6 +18,7 @@ export default function Navbar() {
         { name: "Home", path: "/" },
         { name: "Transaction", path: "/transaction" },
         { name: "Ai Chat", path: "/aichat" },
+        { name: "Financial Goals", path: "/FinancialGoals" },
         { name: "About Us", path: "/about" },
         { name: "Contact Us", path: "/contactus" }
     ];
