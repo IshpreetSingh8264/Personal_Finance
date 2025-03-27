@@ -12,6 +12,8 @@ import AboutUs from "./Pages/AboutUs";
 import AiChat from "./Pages/AiChat";
 import FinancialGoals from "./Pages/FinancialGoals";
 import Analytics from "./Pages/Analytics";
+import AIPrediction from "./Pages/AiPrediction";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -26,6 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <Route path="/test" element={<Signup />} />
         <Route path="/financialgoals" element={<FinancialGoals />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/prediction" element={<AIPrediction />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
