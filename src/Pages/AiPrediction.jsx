@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 
 const predictions = {
   Cryptocurrency: [
@@ -18,11 +19,28 @@ const predictions = {
     { name: "Corporate Bond (AAA)", currentPrice: "$98", predictedPrice: "$101" },
     { name: "Municipal Bond", currentPrice: "$105", predictedPrice: "$107" },
   ],
+  Mfund: [
+    { name: "Global Equity Fund", currentPrice: "$50", predictedPrice: "$53" },
+    { name: "Technology Fund", currentPrice: "$75", predictedPrice: "$80" },
+    { name: "Bond Fund", currentPrice: "$98", predictedPrice: "$101" }
+  ],
+  CFDs: [
+    { name: "Tesla CFD", currentPrice: "$765", predictedPrice: "$815" },
+    { name: "Apple CFD", currentPrice: "$165", predictedPrice: "$180" },
+    { name: "Amazon CFD", currentPrice: "$3,250", predictedPrice: "$3,450" }
+  ],
+
+  FixDeposits: [
+    { name: "1-Year Fixed Deposit", currentPrice: "$100", predictedPrice: "$102" },
+    { name: "2-Year Fixed Deposit", currentPrice: "$98", predictedPrice: "$101" },
+    { name: "5-Year Fixed Deposit", currentPrice: "$105", predictedPrice: "$107" }
+  ]
+
 };
 
 export default function AIPredictions() {
   return (
-    <div>
+    <div className="z-999 bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
       <Navbar />
       <div className="bg-[#121212] min-h-screen text-[#E0E0E0] flex flex-col items-center px-6 py-10">
         
@@ -75,6 +93,8 @@ export default function AIPredictions() {
           ⚠️ AI predictions are based on data analysis and may not be accurate. Always do your own research before making financial decisions.
         </motion.p>
       </div>
+      <Footer />
+
     </div>
   );
 }

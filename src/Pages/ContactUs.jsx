@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FiMail, FiPhone, FiMapPin, FiFacebook, FiInstagram, FiTwitter } from "react-icons/fi";
 import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 
 const ContactUs = () => {
     const [formData, setFormData] = useState({
@@ -40,7 +41,7 @@ const ContactUs = () => {
     };
 
     return (
-        <>
+        <div className="z-999 bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
             <Navbar />
             <div className="min-h-screen bg-[#121212] flex flex-col items-center justify-center px-4 py-10">
                 {/* Page Title */}
@@ -151,7 +152,9 @@ const ContactUs = () => {
                     </form>
                 </motion.div>
             </div>
-        </>
+            <Footer />
+
+        </div>
     );
 };
 

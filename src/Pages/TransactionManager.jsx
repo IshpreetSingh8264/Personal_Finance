@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import axios from "axios";
 
 export default function TransactionManager() {
-  const [transactions, setTransactions] = useState([]);
+  const [allTransactions, setAllTransactions] = useState([]); // Store all transactions
+  const [currentTransactions, setCurrentTransactions] = useState([]); // Transactions to display in current page
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -11,24 +15,28 @@ export default function TransactionManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const transactionsPerPage = 10;
 
-  // Pagination calculations
-  const indexOfLastTransaction = currentPage * transactionsPerPage;
-  const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
-  const currentTransactions = transactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
-  const totalPages = Math.ceil(transactions.length / transactionsPerPage);
-
   useEffect(() => {
-    const storedTransactions = localStorage.getItem("transactions");
-    if (storedTransactions) {
-      setTransactions(JSON.parse(storedTransactions));
-    }
+    const fetchTransactions = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${import.meta.env.VITE_BASE_API_URL}/api/transactions`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAllTransactions(response.data.content); // Store complete transactions
+        setCurrentTransactions(response.data.content.slice(0, transactionsPerPage)); // Set first page transactions
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+    fetchTransactions();
   }, []);
 
   useEffect(() => {
-    if (transactions.length > 0) {
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-    }
-  }, [transactions]);
+    // Update current transactions whenever currentPage changes
+    const indexOfLastTransaction = currentPage * transactionsPerPage;
+    const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
+    setCurrentTransactions(allTransactions.slice(indexOfFirstTransaction, indexOfLastTransaction));
+  }, [currentPage, allTransactions]);
 
   const initialFormState = {
     id: "",
@@ -45,21 +53,31 @@ export default function TransactionManager() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.description || !form.amount) return alert("All fields are required!");
 
-    if (isEditing) {
-      setTransactions((prev) =>
-        prev.map((t) => (t.id === form.id ? { ...form, amount: parseFloat(form.amount) } : t))
-      );
-      setIsEditing(false);
-    } else {
-      setTransactions([{ ...form, id: Date.now().toString(), amount: parseFloat(form.amount) }, ...transactions]);
+    try {
+      const token = localStorage.getItem("token");
+      if (isEditing) {
+        await axios.put(`${import.meta.env.VITE_BASE_API_URL}/api/transactions/${form.id}`, form, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAllTransactions((prev) =>
+          prev.map((t) => (t.id === form.id ? { ...form, amount: parseFloat(form.amount) } : t))
+        );
+        setIsEditing(false);
+      } else {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_API_URL}/api/transactions`, form, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAllTransactions([response.data, ...allTransactions]);
+      }
+      setForm(initialFormState);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error saving transaction:", error);
     }
-
-    setForm(initialFormState);
-    setIsModalOpen(false);
   };
 
   const handleEdit = (transaction) => {
@@ -68,80 +86,133 @@ export default function TransactionManager() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure?")) {
-      const updatedTransactions = transactions.filter((t) => t.id !== id);
-      setTransactions(updatedTransactions);
-      localStorage.setItem("transactions", JSON.stringify(updatedTransactions));
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`${import.meta.env.VITE_BASE_API_URL}/api/transactions/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setAllTransactions((prev) => prev.filter((t) => t.id !== id));
+      } catch (error) {
+        console.error("Error deleting transaction:", error);
+      }
     }
   };
 
+  // Calculate total Income, Expenses, and Upcoming Expenses
+  const totalIncome = allTransactions.filter(tx => tx.type === "Income").reduce((acc, tx) => acc + tx.amount, 0);
+  const totalExpense = allTransactions.filter(tx => tx.type === "Expense").reduce((acc, tx) => acc + tx.amount, 0);
+  const totalUpcomingExpense = allTransactions.filter(tx => tx.type === "Upcoming Expense").reduce((acc, tx) => acc + tx.amount, 0);
+  const balance = totalIncome - totalExpense;
+
   return (
-    <div>
+    <div className="z-999 bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
       <Navbar />
       <div className="bg-[#121212] min-h-screen text-[#E0E0E0] p-6 flex flex-col items-center">
         <h2 className="text-2xl font-bold text-white mb-4 text-center">💰 Transaction Manager</h2>
 
-        <div className="bg-[#1E1E1E] p-4 rounded-lg shadow-lg border border-[#292929] w-full max-w-4xl overflow-x-auto">
-          {transactions.length === 0 ? (
-            <p className="text-center text-gray-400">No transactions yet.</p>
-          ) : (
-            <>
-              <table className="w-full text-left border-collapse border border-[#292929] text-sm md:text-base">
-                <thead>
-                  <tr className="bg-[#1E1E1E] text-white">
-                    <th className="p-2 md:p-3 border border-[#292929]">Date</th>
-                    <th className="p-2 md:p-3 border border-[#292929]">Description</th>
-                    <th className="p-2 md:p-3 border border-[#292929]">Type</th>
-                    <th className="p-2 md:p-3 border border-[#292929]">Amount</th>
-                    <th className="p-2 md:p-3 border border-[#292929]">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentTransactions.map((t) => (
-                    <motion.tr
-                      key={t.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="hover:bg-[#1C1C1C]"
-                    >
-                      <td className="p-2 md:p-3 border border-[#292929]">{t.date}</td>
-                      <td className="p-2 md:p-3 border border-[#292929]">{t.description}</td>
-                      <td className={`p-2 md:p-3 border border-[#292929] ${t.type === "Income" ? "text-green-400": t.type === "Expense" ? "text-red-400":"text-yellow-400"}`}>{t.type}</td>
-                      <td className="p-2 md:p-3 border border-[#292929]">₹{t.amount.toFixed(2)}</td>
-                      <td className="p-2 md:p-3 border border-[#292929] flex gap-2">
-                        <button onClick={() => handleEdit(t)} className="text-[#03DAC6]">✏️</button>
-                        <button onClick={() => handleDelete(t.id)} className="text-[#F44336]">🗑️</button>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="flex justify-between items-center mt-4">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  className="px-4 py-2 bg-[#333333] text-white rounded-lg disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <span className="text-white">Page {currentPage} of {totalPages}</span>
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  className="px-4 py-2 bg-[#4CAF50] text-white rounded-lg disabled:opacity-50"
-                >
-                  Next
-                </button>
+        <div className="flex flex-col md:flex-row w-full max-w-6xl gap-6">
+          {/* Left Side: Transactions Table */}
+          <div className="bg-[#1E1E1E] p-4 rounded-lg shadow-lg border border-[#292929] w-full md:w-2/3 overflow-x-auto">
+            {allTransactions.length === 0 ? (
+              <p className="text-center text-gray-400">No transactions yet.</p>
+            ) : (
+              <>
+                <table className="w-full text-left border-collapse border border-[#292929] text-sm md:text-base">
+                  <thead>
+                    <tr className="bg-[#1E1E1E] text-white">
+                      <th className="p-2 md:p-3 border border-[#292929]">Date</th>
+                      <th className="p-2 md:p-3 border border-[#292929]">Description</th>
+                      <th className="p-2 md:p-3 border border-[#292929]">Type</th>
+                      <th className="p-2 md:p-3 border border-[#292929]">Amount</th>
+                      <th className="p-2 md:p-3 border border-[#292929]">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentTransactions.map((t) => (
+                      <motion.tr
+                        key={t.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="hover:bg-[#1C1C1C]"
+                      >
+                        <td className="p-2 md:p-3 border border-[#292929]">{t.date}</td>
+                        <td className="p-2 md:p-3 border border-[#292929]">{t.description}</td>
+                        <td className={`p-2 md:p-3 border border-[#292929] ${t.type === "Income" ? "text-green-400" : t.type === "Expense" ? "text-red-400" : "text-yellow-400"}`}>{t.type}</td>
+                        <td className="p-2 md:p-3 border border-[#292929]">₹{t.amount.toFixed(2)}</td>
+                        <td className="p-2 md:p-3 border border-[#292929] flex justify-evenly gap-2">
+                          <button
+                            onClick={() => handleEdit(t)}
+                            className="p-2 bg-[#03DAC6] hover:bg-[#00BFA5] text-white rounded transition-all duration-200 ease-in-out transform hover:scale-110 cursor-pointer"
+                          >
+                            <FaEdit size={16} />
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(t.id)}
+                            className="p-2 bg-[#F44336] hover:bg-[#D32F2F] text-white rounded transition-all duration-200 ease-in-out transform hover:scale-110 cursor-pointer"
+                          >
+                            <FaTrash size={16} />
+                          </button>
+                        </td>
+
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="flex justify-between items-center mt-4">
+                  <button
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    className="px-4 py-2 bg-[#333333] text-white rounded-lg disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-white">Page {currentPage} of {Math.ceil(allTransactions.length / transactionsPerPage)}</span>
+                  <button
+                    disabled={currentPage * transactionsPerPage >= allTransactions.length}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className="px-4 py-2 bg-[#4CAF50] text-white rounded-lg disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Right Side: Financial Summary */}
+          <div className="bg-[#1E1E1E] p-4 rounded-lg shadow-lg border border-[#292929] w-full md:w-1/3 flex flex-col gap-4">
+            <div className="flex flex-col items-center p-4 bg-[#232323] rounded-lg">
+              <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Balance</h3>
+              <div className={`text-2xl font-bold ${balance >= 0 ? "text-[#00C853]" : "text-[#F44336]"}`}>
+                ₹{balance.toFixed(2)}
               </div>
-            </>
-          )}
+            </div>
+            <div className="flex flex-col items-center p-4 bg-[#232323] rounded-lg">
+              <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Income</h3>
+              <div className="text-2xl font-bold text-[#00C853]">₹{totalIncome.toFixed(2)}</div>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-[#232323] rounded-lg">
+              <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Expense</h3>
+              <div className="text-2xl font-bold text-[#F44336]">₹{Math.abs(totalExpense).toFixed(2)}</div>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-[#232323] rounded-lg">
+              <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Upcoming Expense</h3>
+              <div className="text-2xl font-bold text-[#FF9800]">₹{Math.abs(totalUpcomingExpense).toFixed(2)}</div>
+            </div>
+          </div>
         </div>
 
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+            setIsEditing(false); // Reset edit mode
+            setForm(initialFormState); // Reset form
+          }}
           className="fixed bottom-6 right-6 bg-[#4CAF50] text-white p-4 md:p-5 rounded-full shadow-lg hover:bg-[#388E3C]"
         >
           ➕
@@ -162,8 +233,8 @@ export default function TransactionManager() {
                   </select>
                   <input type="date" name="date" value={form.date} onChange={handleChange} className="w-full p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white" />
                   <div className="flex justify-between">
-                    <button type="submit" className="bg-[#4CAF50] text-white px-4 py-2 rounded hover:bg-[#388E3C]">{isEditing ? "Update" : "Add"}</button>
                     <button type="button" onClick={() => setIsModalOpen(false)} className="bg-[#F44336] text-white px-4 py-2 rounded hover:bg-[#D32F2F]">Cancel</button>
+                    <button type="submit" className="bg-[#4CAF50] text-white px-4 py-2 rounded hover:bg-[#388E3C]">{isEditing ? "Update" : "Add"}</button>
                   </div>
                 </form>
               </motion.div>
@@ -171,7 +242,7 @@ export default function TransactionManager() {
           )}
         </AnimatePresence>
       </div>
+      <Footer />
     </div>
   );
 }
-

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import Navbar from "../Components/Navbar";
 import { Link } from "react-router-dom";
+import Footer from "../Components/Footer";
 
 // Import images
 // import problemImage from "https://placehold.co/600x400"; // Replace with actual image path
@@ -10,7 +11,7 @@ import { Link } from "react-router-dom";
 // import techImage from "https://placehold.co/600x400";
 const AboutUs = () => {
     return (
-        <>
+        <div className="z-999 bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
             <Navbar />
             <div className="bg-[#121212] text-[#E0E0E0] min-h-screen py-24 px-8 sm:px-16 md:px-28 lg:px-40 xl:px-52">
 
@@ -127,7 +128,9 @@ const AboutUs = () => {
                     </Link>
                 </motion.div>
             </div>
-        </>
+            <Footer />
+
+        </div>
     );
 };
 

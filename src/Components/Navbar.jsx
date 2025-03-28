@@ -5,6 +5,7 @@ import "./Navbar.css";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // New state for authentication
     const navbarRef = useRef(null);
     const [navbarHeight, setNavbarHeight] = useState(0);
 
@@ -12,7 +13,18 @@ export default function Navbar() {
         if (navbarRef.current) {
             setNavbarHeight(navbarRef.current.offsetHeight);
         }
+        // Simulate checking user authentication status
+        const userLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        setIsLoggedIn(userLoggedIn);
     }, []);
+
+    const handleLogout = () => {
+        localStorage.setItem("isLoggedIn", "false");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.reload(); // Refresh the page to reflect the changes";
+        setIsLoggedIn(false);
+    };
 
     const navLinks = [
         { name: "Home", path: "/" },
@@ -47,14 +59,25 @@ export default function Navbar() {
                         ))}
                     </div>
 
-                    {/* Sign-in and Sign-up Buttons */}
+                    {/* Sign-in/Sign-up or Log-out Buttons */}
                     <div className="hidden sm:flex gap-3">
-                        <Link to="/login" className="py-2 px-4 rounded-lg border border-[#292929] bg-[#333333] text-[#E0E0E0] hover:bg-[#1E1E1E] transition">
-                            Sign in
-                        </Link>
-                        <Link to="/signup" className="py-2 px-4 rounded-lg bg-[#4CAF50] text-white font-semibold hover:bg-[#388E3C] transition">
-                            Sign up
-                        </Link>
+                        {isLoggedIn ? (
+                            <button
+                                onClick={handleLogout}
+                                className="py-2 px-4 rounded-lg bg-[#E53935] text-white font-semibold hover:bg-[#D32F2F] transition"
+                            >
+                                Log out
+                            </button>
+                        ) : (
+                            <>
+                                <Link to="/login" className="py-2 px-4 rounded-lg border border-[#292929] bg-[#333333] text-[#E0E0E0] hover:bg-[#1E1E1E] transition">
+                                    Sign in
+                                </Link>
+                                <Link to="/signup" className="py-2 px-4 rounded-lg bg-[#4CAF50] text-white font-semibold hover:bg-[#388E3C] transition">
+                                    Sign up
+                                </Link>
+                            </>
+                        )}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -86,12 +109,23 @@ export default function Navbar() {
                                     </Link>
                                 ))}
                                 <div className="flex flex-col gap-3 mt-3">
-                                    <Link to="/login" className="py-2 px-4 rounded-lg border border-[#292929] bg-[#333333] text-[#E0E0E0] hover:bg-[#1E1E1E] transition">
-                                        Sign in
-                                    </Link>
-                                    <Link to="/signup" className="py-2 px-4 rounded-lg bg-[#4CAF50] text-white font-semibold hover:bg-[#388E3C] transition">
-                                        Sign up
-                                    </Link>
+                                    {isLoggedIn ? (
+                                        <button
+                                            onClick={handleLogout}
+                                            className="py-2 px-4 rounded-lg bg-[#E53935] text-white font-semibold hover:bg-[#D32F2F] transition"
+                                        >
+                                            Log out
+                                        </button>
+                                    ) : (
+                                        <>
+                                            <Link to="/login" className="py-2 px-4 rounded-lg border border-[#292929] bg-[#333333] text-[#E0E0E0] hover:bg-[#1E1E1E] transition">
+                                                Sign in
+                                            </Link>
+                                            <Link to="/signup" className="py-2 px-4 rounded-lg bg-[#4CAF50] text-white font-semibold hover:bg-[#388E3C] transition">
+                                                Sign up
+                                            </Link>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </motion.div>

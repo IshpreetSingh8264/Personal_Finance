@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import axios from "axios";
 
 export default function FinancialGoals() {
   const [goals, setGoals] = useState([]);
@@ -9,7 +12,7 @@ export default function FinancialGoals() {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const goalsPerPage = 5;
+  const goalsPerPage = 10;
 
   // Pagination calculations
   const indexOfLastGoal = currentPage * goalsPerPage;
@@ -18,21 +21,24 @@ export default function FinancialGoals() {
   const totalPages = Math.ceil(goals.length / goalsPerPage);
 
   useEffect(() => {
-    const storedGoals = localStorage.getItem("goals");
-    if (storedGoals) {
-      setGoals(JSON.parse(storedGoals));
-    }
+    const fetchGoals = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${import.meta.env.VITE_BASE_API_URL}/api/goals`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setGoals(response.data.content); // Assuming response.data.content contains the goals array
+      } catch (error) {
+        console.error("Error fetching goals:", error);
+      }
+    };
+    fetchGoals();
   }, []);
-
-  useEffect(() => {
-    if (goals.length > 0) {
-      localStorage.setItem("goals", JSON.stringify(goals));
-    }
-  }, [goals]);
 
   const initialFormState = {
     id: "",
-    text: "",
+    goal: "",         // Represents the amount now
+    description: "",
     deadline: "",
     completed: false,
   };
@@ -44,21 +50,33 @@ export default function FinancialGoals() {
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.text.trim()) return alert("Goal description is required!");
-
-    if (isEditing) {
-      setGoals((prev) =>
-        prev.map((goal) => (goal.id === form.id ? { ...form } : goal))
-      );
-      setIsEditing(false);
-    } else {
-      setGoals([{ ...form, id: Date.now().toString() }, ...goals]);
+    if (!form.goal || isNaN(form.goal) || Number(form.goal) <= 0) {
+      return alert("A valid goal amount is required!");
     }
 
-    setForm(initialFormState);
-    setIsModalOpen(false);
+    try {
+      const token = localStorage.getItem("token");
+      if (isEditing) {
+        await axios.put(`${import.meta.env.VITE_BASE_API_URL}/api/goals/${form.id}`, form, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setGoals((prev) =>
+          prev.map((goal) => (goal.id === form.id ? { ...form } : goal))
+        );
+        setIsEditing(false);
+      } else {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_API_URL}/api/goals`, form, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setGoals((prev) => [response.data, ...prev]); // Add new goal to the list
+      }
+      setForm(initialFormState);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error saving goal:", error);
+    }
   };
 
   const handleEdit = (goal) => {
@@ -67,17 +85,23 @@ export default function FinancialGoals() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure?")) {
-      const updatedGoals = goals.filter((goal) => goal.id !== id);
-      setGoals(updatedGoals);
-      localStorage.setItem("goals", JSON.stringify(updatedGoals));
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(`${import.meta.env.VITE_BASE_API_URL}/api/goals/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setGoals((prev) => prev.filter((goal) => goal.id !== id));
+      } catch (error) {
+        console.error("Error deleting goal:", error);
+      }
     }
   };
 
   return (
     <>
-      <div>
+      <div className="z-999 bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
         <Navbar />
         <div className="bg-[#121212] min-h-screen text-[#E0E0E0] p-6 flex flex-col items-center">
           <h2 className="text-2xl font-bold text-white mb-4 text-center">🎯 Financial Goals</h2>
@@ -90,7 +114,8 @@ export default function FinancialGoals() {
                 <table className="w-full text-left border-collapse border border-[#292929] text-sm md:text-base">
                   <thead>
                     <tr className="bg-[#1E1E1E] text-white">
-                      <th className="p-2 md:p-3 border border-[#292929]">Goal</th>
+                      <th className="p-2 md:p-3 border border-[#292929]">Amount</th> {/* Updated label */}
+                      <th className="p-2 md:p-3 border border-[#292929]">Description</th>
                       <th className="p-2 md:p-3 border border-[#292929]">Deadline</th>
                       <th className="p-2 md:p-3 border border-[#292929]">Status</th>
                       <th className="p-2 md:p-3 border border-[#292929]">Actions</th>
@@ -104,16 +129,28 @@ export default function FinancialGoals() {
                         animate={{ opacity: 1, x: 0 }}
                         className="hover:bg-[#1C1C1C]"
                       >
-                        <td className="p-2 md:p-3 border border-[#292929]">{goal.text}</td>
+                        <td className="p-2 md:p-3 border border-[#292929]">${goal.goal}</td> {/* Display as amount */}
+                        <td className="p-2 md:p-3 border border-[#292929]">{goal.description || "No description"}</td>
                         <td className="p-2 md:p-3 border border-[#292929]">
                           {goal.deadline ? `${goal.deadline} days` : "No deadline"}
                         </td>
                         <td className="p-2 md:p-3 border border-[#292929]">
                           {goal.completed ? "Completed" : "Not Completed"}
                         </td>
-                        <td className="p-2 md:p-3 border border-[#292929] flex gap-2">
-                          <button onClick={() => handleEdit(goal)} className="text-[#03DAC6]">✏️</button>
-                          <button onClick={() => handleDelete(goal.id)} className="text-[#F44336]">🗑️</button>
+                        <td className="p-2 md:p-3 border border-[#292929] flex justify-evenly gap-2">
+                          <button
+                            onClick={() => handleEdit(goal)}
+                            className="p-2 bg-[#03DAC6] hover:bg-[#00BFA5] text-white rounded transition-all duration-200 ease-in-out transform hover:scale-110 cursor-pointer"
+                          >
+                            <FaEdit size={16} />
+                          </button>
+
+                          <button
+                            onClick={() => handleDelete(goal.id)}
+                            className="p-2 bg-[#F44336] hover:bg-[#D32F2F] text-white rounded transition-all duration-200 ease-in-out transform hover:scale-110 cursor-pointer"
+                          >
+                            <FaTrash size={16} />
+                          </button>
                         </td>
                       </motion.tr>
                     ))}
@@ -143,7 +180,11 @@ export default function FinancialGoals() {
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setForm(initialFormState); // Reset form fields
+              setIsEditing(false); // Ensure it's not in edit mode
+              setIsModalOpen(true); // Open modal
+            }}
             className="fixed bottom-6 right-6 bg-[#4CAF50] text-white p-4 md:p-5 rounded-full shadow-lg hover:bg-[#388E3C]"
           >
             ➕
@@ -151,55 +192,63 @@ export default function FinancialGoals() {
 
           <AnimatePresence>
             {isModalOpen && (
-        <motion.div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md">
-          <motion.div className="bg-[#1E1E1E] p-6 rounded-lg shadow-lg w-11/12 max-w-md">
-            <h2 className="text-xl font-bold mb-4">{isEditing ? "Edit Goal" : "Add Goal"}</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                name="text"
-                placeholder="Goal Description"
-                value={form.text}
-                onChange={handleChange}
-                className="w-full p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
-              />
-              <input
-                type="number"
-                name="deadline"
-                placeholder="Deadline (in days)"
-                value={form.deadline}
-                onChange={handleChange}
-                className="w-full p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
-              />
-              <label className="flex items-center gap-2 text-white">
-                <input
-                  type="checkbox"
-                  name="completed"
-                  checked={form.completed}
-                  onChange={handleChange}
-                  className="form-checkbox"
-                />
-                Completed
-              </label>
-              <div className="flex justify-between">
-                <button type="submit" className="bg-[#4CAF50] text-white px-4 py-2 rounded hover:bg-[#388E3C]">
-                  {isEditing ? "Update" : "Add"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-[#F44336] text-white px-4 py-2 rounded hover:bg-[#D32F2F]"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </motion.div>
-        </motion.div>
-          )}
-      </AnimatePresence>
-    </div >
-    </div >
-  </>
+              <motion.div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md">
+                <motion.div className="bg-[#1E1E1E] p-6 rounded-lg shadow-lg w-11/12 max-w-md">
+                  <h2 className="text-xl font-bold mb-4">{isEditing ? "Edit Goal" : "Add Goal"}</h2>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <input
+                      type="number"
+                      name="goal" // Represents the amount
+                      placeholder="Goal Amount (e.g., 1000)"
+                      value={form.goal}
+                      onChange={handleChange}
+                      className="w-full p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
+                    />
+                    <textarea
+                      name="description"
+                      placeholder="Detailed Description"
+                      value={form.description}
+                      onChange={handleChange}
+                      className="w-full p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
+                    ></textarea>
+                    <input
+                      type="number"
+                      name="deadline"
+                      placeholder="Deadline (in days)"
+                      value={form.deadline}
+                      onChange={handleChange}
+                      className="w-full p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
+                    />
+                    <label className="flex items-center gap-2 text-white">
+                      <input
+                        type="checkbox"
+                        name="completed"
+                        checked={form.completed}
+                        onChange={handleChange}
+                        className="form-checkbox"
+                      />
+                      Completed
+                    </label>
+                    <div className="flex justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setIsModalOpen(false)}
+                        className="bg-[#F44336] text-white px-4 py-2 rounded hover:bg-[#D32F2F]"
+                      >
+                        Cancel
+                      </button>
+                      <button type="submit" className="bg-[#4CAF50] text-white px-4 py-2 rounded hover:bg-[#388E3C]">
+                        {isEditing ? "Update" : "Add"}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+      <Footer />
+    </>
   );
 }
