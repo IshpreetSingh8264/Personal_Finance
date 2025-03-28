@@ -19,7 +19,7 @@ const AiChat = () => {
 
                     {/* AI Chat Frame */}
                     <iframe
-                        src="http://192.168.7.99:3000/"
+                        src="http://192.168.116.28:3000/"
                         width="100%"
                         height="100%"
                         className="w-full h-full rounded-xl"

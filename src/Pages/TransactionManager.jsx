@@ -4,6 +4,7 @@ import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import Swal from "sweetalert2"; // Add this import
 
 export default function TransactionManager() {
   const [allTransactions, setAllTransactions] = useState([]); // Store all transactions
@@ -87,15 +88,27 @@ export default function TransactionManager() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure?")) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
       try {
         const token = localStorage.getItem("token");
         await axios.delete(`${import.meta.env.VITE_BASE_API_URL}/api/transactions/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAllTransactions((prev) => prev.filter((t) => t.id !== id));
+        Swal.fire("Deleted!", "Your transaction has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting transaction:", error);
+        Swal.fire("Error!", "Failed to delete the transaction.", "error");
       }
     }
   };
@@ -135,6 +148,7 @@ export default function TransactionManager() {
                         key={t.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.2 }} // Reduce animation duration
                         className="hover:bg-[#1C1C1C]"
                       >
                         <td className="p-2 md:p-3 border border-[#292929]">{t.date}</td>
@@ -144,14 +158,14 @@ export default function TransactionManager() {
                         <td className="p-2 md:p-3 border border-[#292929] flex justify-evenly gap-2">
                           <button
                             onClick={() => handleEdit(t)}
-                            className="p-2 bg-[#03DAC6] hover:bg-[#00BFA5] text-white rounded transition-all duration-200 ease-in-out transform hover:scale-110 cursor-pointer"
+                            className="p-2 bg-[#03DAC6] hover:bg-[#00BFA5] text-white rounded transition-transform duration-200 ease-in-out transform hover:scale-110 cursor-pointer"
                           >
                             <FaEdit size={16} />
                           </button>
 
                           <button
                             onClick={() => handleDelete(t.id)}
-                            className="p-2 bg-[#F44336] hover:bg-[#D32F2F] text-white rounded transition-all duration-200 ease-in-out transform hover:scale-110 cursor-pointer"
+                            className="p-2 bg-[#F44336] hover:bg-[#D32F2F] text-white rounded transition-transform duration-200 ease-in-out transform hover:scale-110 cursor-pointer"
                           >
                             <FaTrash size={16} />
                           </button>

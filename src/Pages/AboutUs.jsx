@@ -3,23 +3,33 @@ import Navbar from "../Components/Navbar";
 import { Link } from "react-router-dom";
 import Footer from "../Components/Footer";
 
-// Import images
-// import problemImage from "https://placehold.co/600x400"; // Replace with actual image path
-// import solutionImage from "https://placehold.co/600x400";
-// import marketImage from "https://placehold.co/600x400";
-// import businessImage from "https://placehold.co/600x400";
-// import techImage from "https://placehold.co/600x400";
 const AboutUs = () => {
     return (
-        <div className="z-999 bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
+        <div className="bg-[#121212] text-[#E0E0E0]">
             <Navbar />
+
+            {/* Large Centered Image Section */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="flex justify-center mt-8"
+            >
+                <img
+                    src="/images/aboutusinflow.png" // Change this to your desired image URL
+                    alt="Inflow Overview"
+                    className="max-w-200 rounded-lg" // Ensure the image is responsive
+                    loading="lazy" // Lazy-load image for performance
+                />
+            </motion.div>
+
             <div className="bg-[#121212] text-[#E0E0E0] min-h-screen py-24 px-8 sm:px-16 md:px-28 lg:px-40 xl:px-52">
 
                 {/* Heading Section */}
                 <motion.div
                     initial={{ opacity: 0, y: -30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
+                    transition={{ duration: 0.6 }}
                     className="text-center mb-20"
                 >
                     <h1 className="text-5xl font-bold text-white leading-tight">About Inflow</h1>
@@ -32,7 +42,7 @@ const AboutUs = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
                     className="flex flex-col lg:flex-row items-center bg-[#1E1E1E] p-12 rounded-2xl shadow-lg mb-16"
                 >
                     <div className="lg:w-1/2">
@@ -47,7 +57,7 @@ const AboutUs = () => {
                         </ul>
                     </div>
                     <div className="lg:w-1/2 flex justify-center mt-8 lg:mt-0">
-                        <img src="https://placehold.co/800x500" alt="Problem Illustration" className="w-full max-w-lg rounded-xl" />
+                        <img src="/images/2.png" alt="Problem Illustration" className="w-full max-w-lg rounded-xl" loading="lazy" />
                     </div>
                 </motion.div>
 
@@ -55,7 +65,7 @@ const AboutUs = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
                     className="flex flex-col lg:flex-row-reverse items-center bg-[#1E1E1E] p-12 rounded-2xl shadow-lg mb-16"
                 >
                     <div className="lg:w-1/2">
@@ -70,7 +80,7 @@ const AboutUs = () => {
                         </ul>
                     </div>
                     <div className="lg:w-1/2 flex justify-center mt-8 lg:mt-0">
-                        <img src="https://placehold.co/800x500" alt="Solution Illustration" className="w-full max-w-lg rounded-xl" />
+                        <img src="/images/application.png" alt="Solution Illustration" className="w-full max-w-lg rounded-xl" loading="lazy" />
                     </div>
                 </motion.div>
 
@@ -78,11 +88,11 @@ const AboutUs = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.6 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
                     className="bg-[#1E1E1E] p-12 rounded-2xl shadow-lg mb-16 text-center"
                 >
                     <h2 className="text-4xl font-semibold text-white">🌍 Market Opportunity</h2>
-                    <img src="https://placehold.co/800x500" alt="Market Growth" className="w-full max-w-lg mx-auto my-6 rounded-xl" />
+                    <img src="/images/analytics.png" alt="Market Growth" className="w-full max-w-lg mx-auto my-6 rounded-xl" loading="lazy" />
                     <p className="text-[#B0B0B0] mt-4 text-lg leading-relaxed">
                         The global personal finance software market is expected to reach **$4,221.1 million by 2032**. Inflow targets a growing user base seeking AI-driven financial tools.
                     </p>
@@ -93,7 +103,7 @@ const AboutUs = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.8 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
                     className="flex flex-col lg:flex-row items-center bg-[#1E1E1E] p-12 rounded-2xl shadow-lg mb-16"
                 >
                     <div className="lg:w-1/2">
@@ -105,7 +115,7 @@ const AboutUs = () => {
                         </ul>
                     </div>
                     <div className="lg:w-1/2 flex justify-center mt-8 lg:mt-0">
-                        <img src="https://placehold.co/800x500" alt="Business Model" className="w-full max-w-lg rounded-xl" />
+                        <img src="images/5.png" alt="Business Model" className="w-full max-w-lg rounded-xl" loading="lazy" />
                     </div>
                 </motion.div>
 
@@ -113,7 +123,7 @@ const AboutUs = () => {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 1.2 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
                     className="text-center mt-20"
                 >
                     <h2 className="text-4xl font-semibold text-white">🚀 Join Us in Transforming Finance!</h2>
@@ -129,7 +139,6 @@ const AboutUs = () => {
                 </motion.div>
             </div>
             <Footer />
-
         </div>
     );
 };

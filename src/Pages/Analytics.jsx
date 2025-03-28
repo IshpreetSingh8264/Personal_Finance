@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
-import { PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { Pie, Cell, Tooltip, Legend, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Line } from "recharts";
 import Navbar from "../Components/Navbar";
 import axios from "axios";
+
+// Lazy load heavy components
+const PieChart = lazy(() => import("recharts").then((mod) => ({ default: mod.PieChart })));
+const LineChart = lazy(() => import("recharts").then((mod) => ({ default: mod.LineChart })));
 
 export default function BudgetAnalytics() {
   const [transactions, setTransactions] = useState([]); // State for transactions
@@ -23,7 +27,7 @@ export default function BudgetAnalytics() {
         const response = await axios.get(`${import.meta.env.VITE_BASE_API_URL}/api/transactions`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setTransactions(response.data.content); // Set transactions from API response
+        setTransactions(response.data.content);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       }
@@ -31,10 +35,12 @@ export default function BudgetAnalytics() {
     fetchTransactions();
   }, []);
 
-  // Helper: filtered transactions for table based on filterType
-  const filteredTransactions = filterType
-    ? transactions.filter((t) => t.type === filterType)
-    : transactions;
+  // Memoize filtered transactions
+  const filteredTransactions = useMemo(() => {
+    return filterType
+      ? transactions.filter((t) => t.type === filterType)
+      : transactions;
+  }, [transactions, filterType]);
 
   // Pagination calculations
   const indexOfLastTransaction = currentPage * transactionsPerPage;
@@ -48,12 +54,12 @@ export default function BudgetAnalytics() {
   const upcomingExpenses = transactions.filter((t) => t.type === "Upcoming Expense").reduce((acc, curr) => acc + curr.amount, 0);
   const balance = income - expenses; // upcoming expenses are not subtracted
 
-  // Data for Pie Chart
-  const pieData = [
+  // Memoize pie chart data
+  const pieData = useMemo(() => [
     { name: "Income", value: income, color: "#4CAF50" },
     { name: "Expenses", value: expenses, color: "#F44336" },
     { name: "Upcoming Expense", value: upcomingExpenses, color: "#FF9800" },
-  ];
+  ], [income, expenses, upcomingExpenses]);
 
   // Build balance history data from transactions
   const balanceHistoryRaw = transactions
@@ -65,15 +71,17 @@ export default function BudgetAnalytics() {
       return { date: t.date, Balance: cumulative };
     });
 
-  // Filter balance history by date range if specified
-  const balanceHistory = balanceHistoryRaw.filter((d) => {
-    const dDate = new Date(d.date);
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
-    if (start && dDate < start) return false;
-    if (end && dDate > end) return false;
-    return true;
-  });
+  // Memoize balance history
+  const balanceHistory = useMemo(() => {
+    return balanceHistoryRaw.filter((d) => {
+      const dDate = new Date(d.date);
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      if (start && dDate < start) return false;
+      if (end && dDate > end) return false;
+      return true;
+    });
+  }, [balanceHistoryRaw, startDate, endDate]);
 
   // Handler for pie chart clicks: toggle filter
   const handlePieClick = (data, index) => {
@@ -91,7 +99,7 @@ export default function BudgetAnalytics() {
   return (
     <div className="bg-[#121212] min-h-screen text-[#E0E0E0] p-6">
       <Navbar />
-      <h2 className="text-2xl font-bold text-white mb-4 text-center">📊 Budget Analytics</h2>
+      <h2 className="text-2xl font-bold text-white mb-4 text-center">📊 AI Analytics</h2>
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Expense Table - 75% width */}
@@ -149,67 +157,68 @@ export default function BudgetAnalytics() {
         </motion.div>
 
         {/* Right Panel - 25% width: Pie chart and Line Chart */}
-        <motion.div
-          className="bg-[#1E1E1E] p-6 rounded-lg shadow-lg border border-[#292929] w-full md:w-1/4 flex flex-col items-center"
-          animate={{ opacity: 1, y: 0 }}
-          initial={{ opacity: 0, y: 20 }}
-        >
-          <PieChart width={400} height={400}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <motion.div
+            className="bg-[#1E1E1E] p-6 rounded-lg shadow-lg border border-[#292929] w-full md:w-1/4 flex flex-col items-center"
+            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+          >
+            <PieChart width={400} height={400}>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                innerRadius={70}
+                outerRadius={130}
+                fill="#8884d8"
+                dataKey="value"
+                onClick={handlePieClick}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+            {filterType && (
+              <motion.button
+                onClick={() => setFilterType(null)}
+                className="mt-2 px-4 py-2 bg-[#03DAC6] text-white rounded"
+                whileHover={{ scale: 1.05 }}
+              >
+                Clear Filter: {filterType}
+              </motion.button>
+            )}
 
-            <Pie
-              data={pieData}
-              cx="50%"
-              cy="50%"
-              innerRadius={70}
-              outerRadius={130}
-              fill="#8884d8"
-              dataKey="value"
-              onClick={handlePieClick}
-            >
-              {pieData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-          {filterType && (
-            <motion.button
-              onClick={() => setFilterType(null)}
-              className="mt-2 px-4 py-2 bg-[#03DAC6] text-white rounded"
-              whileHover={{ scale: 1.05 }}
-            >
-              Clear Filter: {filterType}
-            </motion.button>
-          )}
-
-          <div className="mt-6 w-full bg-[#1E1E1E] p-4 rounded-lg shadow-md border border-[#292929]">
-            <h3 className="text-lg font-semibold text-white mb-2 text-center">Balance History</h3>
-            <div className="flex gap-2 justify-center mb-4">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
-              />
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
-              />
+            <div className="mt-6 w-full bg-[#1E1E1E] p-4 rounded-lg shadow-md border border-[#292929]">
+              <h3 className="text-lg font-semibold text-white mb-2 text-center">Balance History</h3>
+              <div className="flex gap-2 justify-center mb-4">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
+                />
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="p-2 rounded bg-[#1C1C1C] border border-[#292929] text-white"
+                />
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={balanceHistory} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#292929" />
+                  <XAxis dataKey="name" stroke="#B0B0B0" tick={{ fill: "#B0B0B0" }} />
+                  <YAxis stroke="#B0B0B0" tick={{ fill: "#B0B0B0" }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="Balance" stroke="#4CAF50" strokeWidth={3} dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={balanceHistory} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#292929" />
-                <XAxis dataKey="name" stroke="#B0B0B0" tick={{ fill: "#B0B0B0" }} />
-                <YAxis stroke="#B0B0B0" tick={{ fill: "#B0B0B0" }} />
-                <Tooltip />
-                <Line type="monotone" dataKey="Balance" stroke="#4CAF50" strokeWidth={3} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </motion.div>
+          </motion.div>
+        </Suspense>
       </div>
     </div >
   );

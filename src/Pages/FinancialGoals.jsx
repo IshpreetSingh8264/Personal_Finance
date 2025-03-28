@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Navbar from "../Components/Navbar";
-import Footer from "../Components/Footer";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import Swal from "sweetalert2"; // Add this import
+
+// Lazy load Navbar and Footer
+const Navbar = lazy(() => import("../Components/Navbar"));
+const Footer = lazy(() => import("../Components/Footer"));
 
 export default function FinancialGoals() {
   const [goals, setGoals] = useState([]);
@@ -32,12 +35,12 @@ export default function FinancialGoals() {
         console.error("Error fetching goals:", error);
       }
     };
-    fetchGoals();
+    fetchGoals(); // Fetch data immediately
   }, []);
 
   const initialFormState = {
     id: "",
-    goal: "",         // Represents the amount now
+    goal: "",
     description: "",
     deadline: "",
     completed: false,
@@ -86,23 +89,41 @@ export default function FinancialGoals() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure?")) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
       try {
         const token = localStorage.getItem("token");
         await axios.delete(`${import.meta.env.VITE_BASE_API_URL}/api/goals/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setGoals((prev) => prev.filter((goal) => goal.id !== id));
+        Swal.fire("Deleted!", "Your goal has been deleted.", "success");
       } catch (error) {
         console.error("Error deleting goal:", error);
+        Swal.fire("Error!", "Failed to delete the goal.", "error");
       }
     }
   };
 
+  const handlePageChange = useCallback((newPage) => {
+    setCurrentPage(newPage);
+  }, []);
+
   return (
     <>
       <div className="z-999 bg-[#121212] min-h-screen text-[#E0E0E0] font-inter">
-        <Navbar />
+        <Suspense fallback={<div className="text-center text-white">Loading...</div>}>
+          <Navbar />
+        </Suspense>
         <div className="bg-[#121212] min-h-screen text-[#E0E0E0] p-6 flex flex-col items-center">
           <h2 className="text-2xl font-bold text-white mb-4 text-center">🎯 Financial Goals</h2>
 
@@ -114,7 +135,7 @@ export default function FinancialGoals() {
                 <table className="w-full text-left border-collapse border border-[#292929] text-sm md:text-base">
                   <thead>
                     <tr className="bg-[#1E1E1E] text-white">
-                      <th className="p-2 md:p-3 border border-[#292929]">Amount</th> {/* Updated label */}
+                      <th className="p-2 md:p-3 border border-[#292929]">Amount</th>
                       <th className="p-2 md:p-3 border border-[#292929]">Description</th>
                       <th className="p-2 md:p-3 border border-[#292929]">Deadline</th>
                       <th className="p-2 md:p-3 border border-[#292929]">Status</th>
@@ -125,14 +146,18 @@ export default function FinancialGoals() {
                     {currentGoals.map((goal) => (
                       <motion.tr
                         key={goal.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         className="hover:bg-[#1C1C1C]"
                       >
-                        <td className="p-2 md:p-3 border border-[#292929]">${goal.goal}</td> {/* Display as amount */}
+                        <td className="p-2 md:p-3 border border-[#292929]">${goal.goal}</td>
                         <td className="p-2 md:p-3 border border-[#292929]">{goal.description || "No description"}</td>
                         <td className="p-2 md:p-3 border border-[#292929]">
-                          {goal.deadline ? `${goal.deadline} days` : "No deadline"}
+                          {goal.deadline ? (
+                            <span className="text-red-500">{`${goal.deadline} days`}</span>
+                          ) : (
+                            "No deadline"
+                          )}
                         </td>
                         <td className="p-2 md:p-3 border border-[#292929]">
                           {goal.completed ? "Completed" : "Not Completed"}
@@ -159,7 +184,7 @@ export default function FinancialGoals() {
                 <div className="flex justify-between items-center mt-4">
                   <button
                     disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
+                    onClick={() => handlePageChange(currentPage - 1)}
                     className="px-4 py-2 bg-[#333333] text-white rounded-lg disabled:opacity-50"
                   >
                     Previous
@@ -167,7 +192,7 @@ export default function FinancialGoals() {
                   <span className="text-white">Page {currentPage} of {totalPages}</span>
                   <button
                     disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
+                    onClick={() => handlePageChange(currentPage + 1)}
                     className="px-4 py-2 bg-[#4CAF50] text-white rounded-lg disabled:opacity-50"
                   >
                     Next
@@ -178,12 +203,12 @@ export default function FinancialGoals() {
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => {
-              setForm(initialFormState); // Reset form fields
-              setIsEditing(false); // Ensure it's not in edit mode
-              setIsModalOpen(true); // Open modal
+              setForm(initialFormState);
+              setIsEditing(false);
+              setIsModalOpen(true);
             }}
             className="fixed bottom-6 right-6 bg-[#4CAF50] text-white p-4 md:p-5 rounded-full shadow-lg hover:bg-[#388E3C]"
           >
@@ -247,8 +272,10 @@ export default function FinancialGoals() {
             )}
           </AnimatePresence>
         </div>
+        <Suspense fallback={<div className="text-center text-white">Loading...</div>}>
+          <Footer />
+        </Suspense>
       </div>
-      <Footer />
     </>
   );
 }

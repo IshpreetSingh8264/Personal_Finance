@@ -1,27 +1,25 @@
-    import React, { useEffect, useState } from "react";
-    import { motion } from "framer-motion";
-    import { ChevronDown, ChevronUp } from "lucide-react";
-    import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, Suspense } from "react";
+import { motion } from "framer-motion"; // Fix: Import directly as a named import
+import { ChevronDown, ChevronUp } from "lucide-react"; // Fix: Import directly as named imports
+import { useNavigate } from "react-router-dom";
 
-    const FinancialDetails = ({ data, upExp }) => {
-        const Navigator = useNavigate();
-        const [expanded, setExpanded] = useState(false);
-        const transactions = data;
+const FinancialDetails = ({ data, upExp }) => {
+    const Navigator = useNavigate();
+    const [expanded, setExpanded] = useState(false);
+    const transactions = data;
 
-        // Calculate total Income and expenses
-        const totalIncome = transactions.filter(tx => tx.type === "Income").reduce((acc, tx) => acc + tx.amount, 0);
-        const totalExpense = transactions.filter(tx => tx.type === "Expense").reduce((acc, tx) => acc + tx.amount, 0);
-        const balance = totalIncome - totalExpense; // Net balance
+    // Calculate total Income and expenses
+    const totalIncome = transactions.filter(tx => tx.type === "Income").reduce((acc, tx) => acc + tx.amount, 0);
+    const totalExpense = transactions.filter(tx => tx.type === "Expense").reduce((acc, tx) => acc + tx.amount, 0);
+    const balance = totalIncome - totalExpense; // Net balance
 
-        return (
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
             <div className="bg-[#121212] text-[#E0E0E0] p-5">
                 <div className="bg-[#1E1E1E] rounded-xl shadow-sm border border-[#292929] p-4 ">
-
                     {/* Highlighted Financial Summary Section */}
                     <div className="bg-[#232323] rounded-lg p-5">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-
                             {/* Balance Column */}
                             <div className="flex flex-col items-center p-4 ">
                                 <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Balance</h3>
@@ -33,23 +31,17 @@
                             <div className="flex flex-col items-center p-4">
                                 <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Income</h3>
                                 <div className="text-2xl font-bold text-[#00C853]">₹{totalIncome.toFixed(2)}</div>
-
                             </div>
-
                             {/* Expense Column */}
                             <div className="flex flex-col items-center p-4 border-l border-[#292929]">
                                 <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Expense</h3>
                                 <div className="text-2xl font-bold text-[#F44336]">₹{Math.abs(totalExpense).toFixed(2)}</div>
-
                             </div>
-
                             {/* Upcoming Expense Column */}
                             <div className="flex flex-col items-center p-4">
                                 <h3 className="text-lg font-semibold text-[#FFFFFF] mb-2">Upcoming Expense</h3>
                                 <div className="text-2xl font-bold text-[#FF9800]">₹{Math.abs(upExp).toFixed(2)}</div>
-
                             </div>
-
                         </div>
                     </div>
 
@@ -101,8 +93,7 @@
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.4 }}
-                            className={` p-2 rounded-lg cursor-pointer hover:bg-[#333333] transition ${expanded ? "bg-[#292929]" : ""
-                                }`}
+                            className={` p-2 rounded-lg cursor-pointer hover:bg-[#333333] transition ${expanded ? "bg-[#292929]" : ""}`}
                             onClick={() => setExpanded(!expanded)}
                         >
                             {expanded ? <ChevronUp size={32} color="#E0E0E0" /> : <ChevronDown size={32} color="#E0E0E0" />}
@@ -110,7 +101,8 @@
                     </motion.div>
                 </div>
             </div>
-        );
-    };
+        </Suspense>
+    );
+};
 
-    export default FinancialDetails;
+export default FinancialDetails;

@@ -6,10 +6,10 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Check localStorage for token on app load
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
-        if (storedToken&&localStorage.getItem("isLoggedIn") === "true"&&storedToken!=null) {
+        const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+        if (storedToken && isLoggedIn) {
             setUser({ token: storedToken }); // Restore user session
         } else {
             setUser(null); // No token found
@@ -20,16 +20,16 @@ export function AuthProvider({ children }) {
     const login = (token) => {
         localStorage.setItem("token", token);
         localStorage.setItem("isLoggedIn", "true");
-
         setUser({ token }); // Update user state with the token
     };
 
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("isLoggedIn");
         setUser(null); // Clear user state
     };
 
-    if (loading) return <div>Loading...</div>; // Prevent flickering
+    if (loading) return <div className="text-center text-white">Loading...</div>; // Lightweight loader
 
     return (
         <AuthContext.Provider value={{ user, login, logout }}>
