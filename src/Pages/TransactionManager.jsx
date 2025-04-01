@@ -5,12 +5,14 @@ import Footer from "../Components/Footer";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import Swal from "sweetalert2"; // Add this import
+import Papa from "papaparse"; // Add this import for CSV parsing
 
 export default function TransactionManager() {
   const [allTransactions, setAllTransactions] = useState([]); // Store all transactions
   const [currentTransactions, setCurrentTransactions] = useState([]); // Transactions to display in current page
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false); // State for loader
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,6 +113,67 @@ export default function TransactionManager() {
         Swal.fire("Error!", "Failed to delete the transaction.", "error");
       }
     }
+  };
+
+  const handleCSVUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    setIsUploading(true); // Show loader
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const transactions = results.data
+          .map((transaction) => {
+            // Map and normalize fields
+            const parsedDate = new Date(transaction["date created"]);
+            if (isNaN(parsedDate)) {
+              console.error(`Invalid date format for transaction:`, transaction);
+              return null; // Skip invalid transactions
+            }
+  
+            let normalizedType = transaction.type.toLowerCase();
+            if (normalizedType === "debit") normalizedType = "Expense";
+            else if (normalizedType === "credit") normalizedType = "Income";
+            else {
+              console.error(`Invalid type for transaction:`, transaction);
+              return null; // Skip invalid transactions
+            }
+  
+            return {
+              description: transaction.description,
+              amount: parseFloat(transaction.amount),
+              type: normalizedType,
+              date: parsedDate.toISOString().split("T")[0], // Reformat date to YYYY-MM-DD
+              note: transaction.note, // Optional field
+            };
+          })
+          .filter(Boolean); // Remove null values (invalid transactions)
+  
+        const token = localStorage.getItem("token");
+  
+        for (const transaction of transactions) {
+          try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_API_URL}/api/transactions`, transaction, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            setAllTransactions((prev) => [response.data, ...prev]); // Append new transaction to the state
+          } catch (error) {
+            console.error("Error importing transaction:", error.response?.data || error.message);
+            Swal.fire("Error!", `Failed to save transaction: ${transaction.description}`, "error");
+          }
+        }
+  
+        setIsUploading(false); // Hide loader
+        Swal.fire("Success!", "All transactions imported successfully.", "success");
+      },
+      error: (error) => {
+        console.error("Error parsing CSV:", error);
+        setIsUploading(false); // Hide loader
+        Swal.fire("Error!", "Failed to parse the CSV file.", "error");
+      },
+    });
   };
 
   // Calculate total Income, Expenses, and Upcoming Expenses
@@ -231,6 +294,23 @@ export default function TransactionManager() {
         >
           ➕
         </motion.button>
+
+        <div className="flex justify-center my-4">
+          <label className="bg-[#4CAF50] text-white px-4 py-2 rounded cursor-pointer hover:bg-[#388E3C]">
+            Upload CSV
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleCSVUpload}
+              className="hidden"
+            />
+          </label>
+        </div>
+        {isUploading && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+            <div className="text-white text-lg">Uploading transactions...</div>
+          </div>
+        )}
 
         <AnimatePresence>
           {isModalOpen && (

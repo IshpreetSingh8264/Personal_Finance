@@ -10,7 +10,6 @@
     transition: transform 0.5s ease-in-out;
     position: relative;
 }
-/* if mobile screen, toggle becomes display flex */
 @media (max-width: 768px) {
     .toggle {
         display: flex;

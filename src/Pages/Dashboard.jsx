@@ -1,6 +1,7 @@
 import React, { useEffect, useState, lazy, Suspense, useDeferredValue } from "react";
 import { motion } from "framer-motion"; // Add this import
 import Footer from "../Components/Footer";
+import BankAccountLinking from "../Components/BankLink";
 
 const Navbar = lazy(() => import("../Components/Navbar"));
 const FinancialDetails = lazy(() => import("../Components/Dashboard/FinancialDetails"));
@@ -173,7 +174,7 @@ function Dashboard() {
                         </p>
                     )}
                 </div>
-
+                    <BankAccountLinking/>
                 <Footer />
             </div>
         </Suspense>
